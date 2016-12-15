@@ -11,12 +11,44 @@ def is_pid(name):
         return False
 
 def enum_procs(cb):
-    '''enumerates all running processes and calls cb with the pid of each one'''
+    '''Enumerates all running processes and calls cb with the pid of each one'''
     for name in filter(is_pid, os.listdir('/proc')):
         cb(name)
 
 
+class ProcInfo(object):
+    '''Holds information about a process, including:
+        * pid - self.pid
+        * ppid - self.ppid
+        * command line - self.cmd
+        * thread count - self.num_threads
+        * virtual size - self.vsize
+        * cpu - self.cpu
+        * up time - self.utime
+    '''
+    def __init__(self, pid):
+        '''Extracts information about a process based on its pid'''
+        self.pid = pid
+        with open('/proc/' + pid + '/stat') as stat:
+            data = stat.read().split()
+            self.cmd = data[1][1:-1]  # remove parenthesis from name, eg. '(/usr/bin/bash)' -> '/usr/bin/bash'
+            self.ppid = data[3]
+            self.utime = data[13]
+            self.num_threads = data[19]
+            self.vsize = data[22]
+            self.cpu = data[38]
+
+
 # quick test:
-def print_pid(pid):
-    print pid
-enum_procs(print_pid)
+def print_proc_info(pid):
+    info = ProcInfo(pid)
+
+    print pid + ':'
+    print 'ppid: ' + info.ppid
+    print 'utime: ' + info.utime
+    print 'cpu: ' + info.cpu
+    print 'vsize: ' + info.vsize
+    print 'num_threads: ' + info.num_threads
+    print 'cmd: ' + info.cmd
+
+enum_procs(print_proc_info)
