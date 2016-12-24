@@ -22,21 +22,22 @@ class ProcInfo(object):
         * ppid - self.ppid
         * command line - self.cmd
         * thread count - self.num_threads
-        * virtual size - self.vsize
+        * virtual memory size - self.vsize
         * cpu - self.cpu
-        * up time - self.utime
+        * utime - self.utime
     '''
     def __init__(self, pid):
         '''Extracts information about a process based on its pid'''
         self.pid = pid
         with open('/proc/' + pid + '/stat') as stat:
             data = stat.read().split()
-            self.cmd = data[1][1:-1]  # remove parenthesis from name, eg. '(/usr/bin/bash)' -> '/usr/bin/bash'
             self.ppid = data[3]
+            self.cmd = data[1][1:-1]  # remove parentheses from name
             self.utime = data[13]
             self.num_threads = data[19]
-            self.vsize = data[22]
             self.cpu = data[38]
+            self.vsize = data[22]
+
 
 
 # quick test:
@@ -50,5 +51,6 @@ def print_proc_info(pid):
     print 'vsize: ' + info.vsize
     print 'num_threads: ' + info.num_threads
     print 'cmd: ' + info.cmd
+    print '\n'
 
 enum_procs(print_proc_info)
