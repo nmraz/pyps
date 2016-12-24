@@ -31,12 +31,12 @@ class ProcInfo(object):
         self.pid = pid
         with open('/proc/' + pid + '/stat') as stat:
             data = stat.read().split()
-            self.ppid = data[3]
-            self.cmd = data[1][1:-1]  # remove parentheses from name
-            self.utime = data[13]
-            self.num_threads = data[19]
-            self.cpu = data[38]
-            self.vsize = data[22]
+        self.ppid        = data[3]
+        self.cmd         = data[1][1:-1]  # remove parentheses from name
+        self.utime       = data[13]
+        self.num_threads = data[19]
+        self.cpu         = data[38]
+        self.vsize       = data[22]
 
 
 
