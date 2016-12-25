@@ -117,4 +117,5 @@ def ps():
     for info in proc_info:
         fmt.print_row(info)
 
-ps()
+if __name__ == '__main__':
+    ps()
