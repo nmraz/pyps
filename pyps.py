@@ -29,13 +29,13 @@ class FmtInfo(object):
     column widths and table headers
     '''
     # table headings...
-    PID_HEADING     = 'pid'
-    PPID_HEADING    = 'ppid'
-    CMD_HEADING     = 'comm'
-    UTIME_HEADING   = 'utime'
-    THREADS_HEADING = 'num_threads'
-    CPU_HEADING     = 'cpu'
-    VSIZE_HEADING   = 'vsize'
+    PID_HEADING     = 'PID'
+    PPID_HEADING    = 'PPID'
+    CMD_HEADING     = 'COMM'
+    UTIME_HEADING   = 'UTIME'
+    THREADS_HEADING = 'NUM_THREADS'
+    CPU_HEADING     = 'CPU'
+    VSIZE_HEADING   = 'VSIZE'
 
     # maximum width for the `comm` column
     MAX_CMD_WIDTH = 15;
