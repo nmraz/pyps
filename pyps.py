@@ -2,20 +2,6 @@
 
 import os
 
-def is_pid(name):
-    '''Returns whether name is a valid pid'''
-    try:
-        int(name)  # pids are just integers
-        return True
-    except ValueError:
-        return False
-
-def enum_procs(cb):
-    '''Enumerates all running processes and calls cb with the pid of each one'''
-    for name in filter(is_pid, os.listdir('/proc')):
-        cb(name)
-
-
 class ProcInfo(object):
     '''Holds information about a process, including:
         * pid - self.pid
@@ -38,7 +24,100 @@ class ProcInfo(object):
         self.cpu         = data[38]
         self.vsize       = data[22]
 
+class FmtInfo(object):
+    '''Encapsulates formatting information, such as
+    column widths and table headers
+    '''
+    # table headings...
+    PID_HEADING     = 'pid'
+    PPID_HEADING    = 'ppid'
+    CMD_HEADING     = 'comm'
+    UTIME_HEADING   = 'utime'
+    THREADS_HEADING = 'num_threads'
+    CPU_HEADING     = 'cpu'
+    VSIZE_HEADING   = 'vsize'
 
+    # maximum width for the `comm` column
+    MAX_CMD_WIDTH = 15;
 
+    def __init__(self):
+        '''Initializes column widths'''
+        self.pid_width     = len(FmtInfo.PID_HEADING)
+        self.ppid_width    = len(FmtInfo.PPID_HEADING)
+        self.cmd_width     = len(FmtInfo.CMD_HEADING)
+        self.utime_width   = len(FmtInfo.UTIME_HEADING)
+        self.threads_width = len(FmtInfo.THREADS_HEADING)
+        self.cpu_width     = len(FmtInfo.CPU_HEADING)
+        self.vsize_width   = len(FmtInfo.VSIZE_HEADING)
 
+    def relayout(self, info):
+        '''Recalculates the layout based on `info`.
+        This essentially just expands columns as necessary
+        '''
+        self.pid_width     = max(self.pid_width, len(info.pid))
+        self.ppid_width    = max(self.ppid_width, len(info.ppid))
 
+        # always truncate to MAX_CMD_WIDTH
+        self.cmd_width     = min(max(self.cmd_width, len(info.cmd)), FmtInfo.MAX_CMD_WIDTH)
+        self.utime_width   = max(self.utime_width, len(info.utime))
+        self.threads_width = max(self.threads_width, len(info.num_threads))
+        self.cpu_width     = max(self.cpu_width, len(info.cpu))
+        self.vsize_width   = max(self.vsize_width, len(info.vsize))
+
+    def fmt_width(self, string, width):
+        '''Formats `string` to have width `width`, padding/truncating as necessary'''
+        str_width = len(string)
+        if str_width > width:
+            # truncate and add elipsis
+            return string[:width-3] + '...'
+        else:
+            # pad with spaces
+            return string + ' ' * (width-str_width)
+
+    def print_headings(self):
+        '''Prints headings for the table'''
+        print (self.fmt_width(FmtInfo.PID_HEADING, self.pid_width) + '   '
+               + self.fmt_width(FmtInfo.PPID_HEADING, self.ppid_width) + '   '
+               + self.fmt_width(FmtInfo.CMD_HEADING, self.cmd_width) + '   '
+               + self.fmt_width(FmtInfo.UTIME_HEADING, self.utime_width) + '   '
+               + self.fmt_width(FmtInfo.THREADS_HEADING, self.threads_width) + '   '
+               + self.fmt_width(FmtInfo.CPU_HEADING, self.cpu_width) + '   '
+               + self.fmt_width(FmtInfo.VSIZE_HEADING, self.vsize_width))
+
+    def print_row(self, info):
+        '''Prints a row in the table'''
+        print (self.fmt_width(info.pid, self.pid_width) + '   '
+               + self.fmt_width(info.ppid, self.ppid_width) + '   '
+               + self.fmt_width(info.cmd, self.cmd_width) + '   '
+               + self.fmt_width(info.utime, self.utime_width) + '   '
+               + self.fmt_width(info.num_threads, self.threads_width) + '   '
+               + self.fmt_width(info.cpu, self.cpu_width) + '   '
+               + self.fmt_width(info.vsize, self.vsize_width))
+
+def is_pid(name):
+    '''Returns whether name is a valid pid'''
+    try:
+        int(name)  # pids are just integers
+        return True
+    except ValueError:
+        return False
+
+def ps():
+    '''Main function: gathers information about all running
+    processes and prints it in a table
+    '''
+    fmt = FmtInfo()
+    proc_info = []
+
+    # pass 1: gather info & formatting
+    for pid in filter(is_pid, os.listdir('/proc')):
+        info = ProcInfo(pid)
+        fmt.relayout(info)
+        proc_info.append(info)
+
+    # pass 2: print table
+    fmt.print_headings()
+    for info in proc_info:
+        fmt.print_row(info)
+
+ps()
