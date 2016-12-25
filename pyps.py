@@ -40,17 +40,5 @@ class ProcInfo(object):
 
 
 
-# quick test:
-def print_proc_info(pid):
-    info = ProcInfo(pid)
 
-    print pid + ':'
-    print 'ppid: ' + info.ppid
-    print 'utime: ' + info.utime
-    print 'cpu: ' + info.cpu
-    print 'vsize: ' + info.vsize
-    print 'num_threads: ' + info.num_threads
-    print 'cmd: ' + info.cmd
-    print '\n'
 
-enum_procs(print_proc_info)
