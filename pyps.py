@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 import os
+import re
 
 class ProcInfo(object):
     '''Holds information about a process, including:
@@ -96,11 +97,7 @@ class FmtInfo(object):
 
 def is_pid(name):
     '''Returns whether name is a valid pid'''
-    try:
-        int(name)  # pids are just integers
-        return True
-    except ValueError:
-        return False
+    return re.compile('^[0-9]+$').search(name)
 
 def ps():
     '''Main function: gathers information about all running
